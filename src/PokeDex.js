@@ -3,11 +3,23 @@ import { useState, useEffect } from "react";
 import ReactLoading from "react-loading";
 import axios from "axios";
 import Modal from "react-modal";
+import Pokemons from "./components/Pokemons";
+import Pagination from "./components/Pagination";
+import Pokemon from "./components/Pokemon";
+import Search from "./components/Search";
+import classes from "./PokeDex.module.css";
 
 function PokeDex() {
   const [pokemons, setPokemons] = useState([]);
   const [pokemonDetail, setPokemonDetail] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  //Pagination
+  const [currentPageUrl, setCurrentPageUrl] = useState(
+    "https://pokeapi.co/api/v2/pokemon"
+  );
+  const [nextPageUrl, setNextPageUrl] = useState(null);
+  const [previousPageUrl, setPreviousPageUrl] = useState(null);
 
   const customStyles = {
     content: {
@@ -22,7 +34,8 @@ function PokeDex() {
     },
     overlay: { backgroundColor: "grey" },
   };
-
+  //Question
+  /** 
   if (!isLoading && pokemons.length === 0) {
     return (
       <div>
@@ -48,6 +61,30 @@ function PokeDex() {
       </div>
     );
   }
+  */
+
+  useEffect(() => {
+    setIsLoading(true)
+    let cancelToken
+    axios.get(currentPageUrl, {
+      cancelToken: new axios.CancelToken(c => cancelToken = c )
+    }).then((res) => {
+      setIsLoading(false);
+      setPreviousPageUrl(res.data.previous);
+      setNextPageUrl(res.data.next);
+      setPokemons(res.data.results);
+    });
+    return () => cancelToken()
+  }, [currentPageUrl]);
+
+  function navigateToPreviousPage() {
+    setCurrentPageUrl(previousPageUrl)
+  }
+
+  function navigateToNextPage() {
+    setCurrentPageUrl(nextPageUrl)
+  }
+
 
   return (
     <div>
@@ -56,37 +93,38 @@ function PokeDex() {
           <>
             <div className="App">
               <header className="App-header">
-                <b>Implement loader here</b>
+                <b>
+                  <ReactLoading type={"spinningBubbles"} color={"cyan"} />
+                </b>
               </header>
             </div>
           </>
         ) : (
           <>
             <h1>Welcome to pokedex !</h1>
-            <b>Implement Pokedex list here</b>
+            <Search />
+            <Pokemons pokemons={pokemons} setPokemonDetail={setPokemonDetail} setIsLoading={setIsLoading}></Pokemons>
+            <Pagination 
+            navigateToPreviousPage={previousPageUrl ? navigateToPreviousPage : null}
+            navigateToNextPage={nextPageUrl ? navigateToNextPage: null}
+            />
           </>
         )}
       </header>
+
       {pokemonDetail && (
         <Modal
-          isOpen={pokemonDetail}
+          isOpen={pokemonDetail ? true : false}
           contentLabel={pokemonDetail?.name || ""}
           onRequestClose={() => {
             setPokemonDetail(null);
           }}
+          ariaHideApp={false}
           style={customStyles}
         >
           <div>
-            Requirement:
-            <ul>
-              <li>show the sprites front_default as the pokemon image</li>
-              <li>
-                Show the stats details - only stat.name and base_stat is
-                required in tabular format
-              </li>
-              <li>Create a bar chart based on the stats above</li>
-              <li>Create a  buttton to download the information generated in this modal as pdf. (images and chart must be included)</li>
-            </ul>
+              <Pokemon name={pokemonDetail.name} image={pokemonDetail.sprites.front_default}
+              stats={pokemonDetail.stats}></Pokemon>
           </div>
         </Modal>
       )}

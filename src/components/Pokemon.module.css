@@ -1,0 +1,25 @@
+/* .container {
+    display: grid;
+    height: 400px;
+    width: 500px;
+    grid-template-areas: 
+    'header header table1 table1 table1'
+    'image image table1 table1 table1'
+    'image image chart chart chart'
+    'image image chart chart chart';
+}
+.header {
+    grid-area: header;
+}
+.image {
+    grid-area: image;
+}
+.table {
+    grid-area: table1;
+}
+.chart {
+    grid-area: chart;
+} */
+
+.container {
+}

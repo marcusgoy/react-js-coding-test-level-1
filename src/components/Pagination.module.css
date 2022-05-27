@@ -1,0 +1,16 @@
+button {
+    text-align: center;
+    font-size: 15x;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 20px;
+    border: 5px solid cyan;
+    transition: transform .5s;
+}
+
+button:hover {
+    color: yellow;
+    background-color: cyan;
+    transform: scale(1.3);
+}
+  
